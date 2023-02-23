@@ -1,24 +1,23 @@
-.App {
+body {
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  margin-top:10px
+}
+
+.char {
+  border-radius: 4px;
+  margin: 3px;
+  float: left;
   text-align: center;
-}
-
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
-}
-
-.App-header {
-  background-color: #222;
-  height: 150px;
-  padding: 20px;
-  color: white;
-}
-
-.App-intro {
-  font-size: large;
-}
-
-@keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  padding-top: 30px;
+  padding-bottom: 20px;
+  width: 80px;
+  height: 50px;
+  font-size: 40px;
+  border: 1px solid #ccc;
+  color: "#262626";
 }
