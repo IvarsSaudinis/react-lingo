@@ -15,12 +15,22 @@ body {
   border-radius: 4px;
   margin: 3px;
   text-align: center;
-  padding-top: 3px;
-  padding-bottom: 20px;
+  padding-top: 0px;
+  padding-bottom: 25px;
   width:100%;
   height: 40px;
   font-size: 40px;
   border: 1px solid #ccc;
   color: "#262626";
   
+}
+
+.key-highlight {
+  background-color: aliceblue;
+  color: orangered
+}
+
+.key-disabled {
+  background-color: aliceblue;
+  color: #CCC
 }

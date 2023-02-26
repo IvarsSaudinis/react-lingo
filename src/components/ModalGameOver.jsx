@@ -34,6 +34,6 @@ ModalGameOver.propTypes = {
     title: PropTypes.string,
     open: PropTypes.bool,
     choosenName: PropTypes.array,
-    definition: PropTypes.array,
+    definition: PropTypes.string,
     closeModal: PropTypes.func
 }

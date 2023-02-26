@@ -36,6 +36,7 @@ class Lingo extends Component {
         winInfo: {
             visible: false
         },
+        layoutName: 'default',
         settings: {
             keyboard: false,
             infoModalVisible: true,
@@ -102,12 +103,12 @@ class Lingo extends Component {
 
         // HELP ME - būtu jādzēš ārā
         if (event.key.toUpperCase() === 'Y') {
-            console.log(choosenName)
+           // console.log(choosenName)
         }
 
         if (event.key.toUpperCase() === 'X') {
             this.setState({
-                isHelpOpened: true,
+                settings: { helpModalVisible: true},
                 usedHelp: true
             })
         }
@@ -232,7 +233,6 @@ class Lingo extends Component {
         }
         const newState = { ...settings, ...sett }
         this.setState(newState)
-        console.log(newState)
     }
 
     closeGameOverModel = () => {
@@ -243,9 +243,19 @@ class Lingo extends Component {
 
     onKeyPress = (button) => {
         const key = { key: button }
+        if (button === "{shift}" || button === "{lock}") this.handleShift();
+
         this.keydownHandler(key)
         // console.log('Button pressed', button)
     }
+
+    handleShift = () => {
+        let layoutName = this.state.layoutName;
+    
+        this.setState({
+          layoutName: layoutName === "default" ? "shift" : "default"
+        });
+      };
 
     changeSettings = (sett) => {
         const { settings } = this.state
@@ -289,7 +299,7 @@ class Lingo extends Component {
 
                 <ModalHelp
                     title="Palīdzība"
-                    open={isHelpOpened}
+                    open={settings.helpModalVisible}
                     definition={definition}
                     closeModal={this.closeModal}
                 />
@@ -320,21 +330,33 @@ class Lingo extends Component {
                     <Keyboard
                         onKeyPress={this.onKeyPress}
                         onChange={this.onChange}
+                        layoutName={this.state.layoutName}
+                        buttonTheme={[
+                            {
+                              class: "key-disabled",
+                              buttons: "Q W Y X"
+                            },
+                            {
+                              class: "key-highlight",
+                              buttons: "{shift}"
+                            }
+                          ]}
                         layout={{
-                            default: [
-                                'Ē Ū Ī Ā Š Ģ Ķ Ļ Ž Č Ņ',
-                                'Q E R T U I O P {bksp}',
-                                'A S D F G H J K L X',
-                                'Z C V B N M {enter}'
+                            'default': [
+                                'Q W E R T Y U I O P {bksp}',
+                                '{shift} A S D F G H J K L',
+                                'Z X C V B N M {enter}'
+                            ], 
+                            'shift': [
+                                'Q W Ē R T Y Ū Ī O P {bksp}',
+                                '{shift} Ā Š D F G H J Ķ Ļ',
+                                'Ž X Č V B Ņ M {enter}'
                             ]
                         }}
                         display={{
                             '{bksp}': 'DZĒST',
                             '{enter}': 'APSTIRPINĀT',
-                            X: ':(',
-                            Q: '?',
-                            W: '-',
-                            Y: '-'
+                            '{shift}': 'A..Ā'
                         }}
                     />
                 )}
