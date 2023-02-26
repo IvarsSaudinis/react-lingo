@@ -25,7 +25,7 @@ export default class Word extends Component {
   };
 
   render() {
-    const { name, choosenName, firstChar } = this.props;
+    const { name, firstChar } = this.props;
 
     // status: none, correct, wrong, misplaced
 

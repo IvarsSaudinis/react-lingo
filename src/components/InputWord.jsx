@@ -1,7 +1,5 @@
 import React, { Component } from "react";
 
-import Char from "./Char"; 
-
 const defaultStyle = {
   borderRadius: "4px",
   margin: "3px",

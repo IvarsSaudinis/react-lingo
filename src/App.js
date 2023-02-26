@@ -12,8 +12,10 @@ import ModalHelp from "./components/ModalHelp";
 import { data } from "./assets/vocabulary.js";
 import { alphabet } from "./assets/alphabet.js";
 
-import './App.css';
+import Keyboard from "react-simple-keyboard";
+import "react-simple-keyboard/build/css/index.css";
 
+import "./App.css";
 
 class Lingo extends Component {
   state = {
@@ -32,16 +34,15 @@ class Lingo extends Component {
     wordCount: 0,
     usedHelp: false,
     winInfo: {
-      visible: false
-    }
+      visible: false,
+    },
   };
-
 
   componentDidMount() {
     document.addEventListener("keydown", this.keydownHandler);
-    document.addEventListener('contextmenu', (e) => {
+    document.addEventListener("contextmenu", (e) => {
       e.preventDefault();
-    }); 
+    });
     let item =
       data.vocabulary[Math.floor(Math.random() * data.vocabulary.length)];
     this.setState({
@@ -50,17 +51,15 @@ class Lingo extends Component {
     });
   }
 
-
   componentWillUnmount() {
-     
     document.removeEventListener("keydown", this.keydownHandler);
-    document.removeEventListener("contextmenu", ()=>{});
+    document.removeEventListener("contextmenu", () => {});
   }
 
   listenEvent = (e) => {
-    console.log("!!!")
-    console.log("event:", e)
-  }
+    console.log("!!!");
+    console.log("event:", e);
+  };
 
   resetGame = () => {
     let item =
@@ -87,7 +86,7 @@ class Lingo extends Component {
       points,
       wordCount,
       usedHelp,
-      definition
+      definition,
     } = this.state;
 
     if (this.state.isGameOverModalOpened) {
@@ -102,9 +101,8 @@ class Lingo extends Component {
 
     // HELP ME - būtu jādzēš ārā
     if (event.key.toUpperCase() === "Y") {
-      console.log(choosenName)
+      console.log(choosenName);
     }
-
 
     if (event.key.toUpperCase() === "X") {
       this.setState({
@@ -116,7 +114,7 @@ class Lingo extends Component {
     // IZDZEŠAM NO MASĪVA BURTUS
     if (
       event.key.toUpperCase() === "DELETE" ||
-      event.key.toUpperCase() === "BACKSPACE"
+      event.key.toUpperCase() === "BACKSPACE" || event.key === "{bksp}"
     ) {
       this.setState({
         name: name.slice(0, -1),
@@ -126,7 +124,7 @@ class Lingo extends Component {
     }
 
     // LOĢIKA, KUR APSTIPRINA VARDU
-    if (name.length == 5 && event.key.toUpperCase() === "ENTER") {
+    if (name.length === 5 && (event.key.toUpperCase() === "ENTER" || event.key === "{enter}")) {
       if (this.findWord(name) === undefined) {
         this.setState({
           wrongWord: true,
@@ -173,8 +171,8 @@ class Lingo extends Component {
             winInfo: {
               visible: true,
               word: uppercaseChoosenName,
-              description: definition
-            }
+              description: definition,
+            },
           });
 
           this.resetGame();
@@ -229,6 +227,18 @@ class Lingo extends Component {
     });
   };
 
+  onChange = (input) => {
+    //keydownHandler = (event) => {
+    console.log("Input changed", input);
+  };
+
+  onKeyPress = (button) => {
+    // event.key.toUpperCase() === "Q")
+    let key = { key: button };
+    this.keydownHandler(key);
+    console.log("Button pressed", button);
+  };
+
   render() {
     const {
       name,
@@ -243,11 +253,11 @@ class Lingo extends Component {
       isGameOverModalOpened,
       points,
       wordCount,
-      winInfo
+      winInfo,
     } = this.state;
 
     return (
-      <div style={{width:"445px", margin: "0 auto"}}>
+      <div style={{ width: "445px", margin: "0 auto" }}>
         <Row>
           <Col>
             <Word
@@ -326,10 +336,36 @@ class Lingo extends Component {
           choosenName={choosenName}
           definition={definition}
         />
-        
-        { winInfo.visible &&
-              <Alert message={"Atminētais vārds: " + winInfo.word || ""} description={winInfo.description || ""} type="success" showIcon closable />
-        }
+
+        <Keyboard
+          onKeyPress={this.onKeyPress}
+          onChange={this.onChange}
+          layout={{
+            default: [ "Ē Ū Ī Ā Š Ģ Ķ Ļ Ž Č Ņ",
+                      "Q E R T U I O P {bksp}",
+                      "A S D F G H J K L X",
+                      "Z C V B N M {enter}"
+                     ]
+          }}
+          display={{       
+              "{bksp}": "DZĒST",
+              "{enter}": "APSTIRPINĀT",
+              "X": ":(",
+              "Q": "?",
+              "W": "-", "Y": "-"
+            }
+          }
+        />
+
+        {winInfo.visible && (
+          <Alert
+            message={"Atminētais vārds: " + winInfo.word || ""}
+            description={winInfo.description || ""}
+            type="success"
+            showIcon
+            closable
+          />
+        )}
       </div>
     );
   }
