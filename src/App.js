@@ -36,6 +36,9 @@ class Lingo extends Component {
     winInfo: {
       visible: false,
     },
+    settings: {
+      keyboard: false,
+    },
   };
 
   componentDidMount() {
@@ -114,7 +117,8 @@ class Lingo extends Component {
     // IZDZEŠAM NO MASĪVA BURTUS
     if (
       event.key.toUpperCase() === "DELETE" ||
-      event.key.toUpperCase() === "BACKSPACE" || event.key === "{bksp}"
+      event.key.toUpperCase() === "BACKSPACE" ||
+      event.key === "{bksp}"
     ) {
       this.setState({
         name: name.slice(0, -1),
@@ -124,7 +128,10 @@ class Lingo extends Component {
     }
 
     // LOĢIKA, KUR APSTIPRINA VARDU
-    if (name.length === 5 && (event.key.toUpperCase() === "ENTER" || event.key === "{enter}")) {
+    if (
+      name.length === 5 &&
+      (event.key.toUpperCase() === "ENTER" || event.key === "{enter}")
+    ) {
       if (this.findWord(name) === undefined) {
         this.setState({
           wrongWord: true,
@@ -239,6 +246,14 @@ class Lingo extends Component {
     console.log("Button pressed", button);
   };
 
+  changeSettings = (sett) => {
+    const {settings} = this.state
+    this.setState({
+     settings:  {...settings, ...sett}
+    })
+    console.log(this.state)
+  }
+
   render() {
     const {
       name,
@@ -254,6 +269,7 @@ class Lingo extends Component {
       points,
       wordCount,
       winInfo,
+      settings,
     } = this.state;
 
     return (
@@ -295,6 +311,7 @@ class Lingo extends Component {
             <InputWord wrongWord={wrongWord} name={name} />
           </Col>
         </Row>
+
         <Divider style={{ margin: "4px 0" }} />
         <Row>
           <Col span={6}>
@@ -316,6 +333,7 @@ class Lingo extends Component {
             />
           </Col>
         </Row>
+
         <ModalHelp
           title="Palīdzība"
           open={isHelpOpened}
@@ -327,6 +345,8 @@ class Lingo extends Component {
           title="Īsumā par react Lingo lietotni"
           open={isInfoModalOpened}
           closeModal={this.closeModal}
+          settings={settings}
+          changeSettings={this.changeSettings}
         />
 
         <ModalGameOver
@@ -337,25 +357,28 @@ class Lingo extends Component {
           definition={definition}
         />
 
-        <Keyboard
-          onKeyPress={this.onKeyPress}
-          onChange={this.onChange}
-          layout={{
-            default: [ "Ē Ū Ī Ā Š Ģ Ķ Ļ Ž Č Ņ",
-                      "Q E R T U I O P {bksp}",
-                      "A S D F G H J K L X",
-                      "Z C V B N M {enter}"
-                     ]
-          }}
-          display={{       
+        {settings.keyboard && (
+          <Keyboard
+            onKeyPress={this.onKeyPress}
+            onChange={this.onChange}
+            layout={{
+              default: [
+                "Ē Ū Ī Ā Š Ģ Ķ Ļ Ž Č Ņ",
+                "Q E R T U I O P {bksp}",
+                "A S D F G H J K L X",
+                "Z C V B N M {enter}",
+              ],
+            }}
+            display={{
               "{bksp}": "DZĒST",
               "{enter}": "APSTIRPINĀT",
-              "X": ":(",
-              "Q": "?",
-              "W": "-", "Y": "-"
-            }
-          }
-        />
+              X: ":(",
+              Q: "?",
+              W: "-",
+              Y: "-",
+            }}
+          />
+        )}
 
         {winInfo.visible && (
           <Alert
