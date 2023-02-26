@@ -1,42 +1,65 @@
-import React, { Component } from "react";
+import PropTypes from 'prop-types'
 
-import Char from "./Char";
+import React, { Component } from 'react'
+import { Col, Row } from 'antd'
+
+import Char from './Char'
 
 export default class Word extends Component {
+    getStatus = (index) => {
+        const { name, choosenName } = this.props
 
-  getStatus = (index) => {
-    const { name, choosenName } = this.props;
-    
-    if(name === "")
-    {
-      return "none"
+        if (name === '') {
+            return 'none'
+        }
+
+        if (choosenName[index] === name[index]) {
+            return 'correct'
+        }
+
+        if (choosenName.indexOf(name[index]) === -1) {
+            return 'wrong'
+        } else {
+            return 'misplaced'
+        }
     }
-   
-    if (choosenName[index] === name[index]) {
-      return "correct";
-    } 
-    
-    if (choosenName.indexOf(name[index])===-1) {
-      return  "wrong";
-    }  else {
-      return  "misplaced";
+
+    render() {
+        const { name, firstChar } = this.props
+
+        // status: none, correct, wrong, misplaced
+
+        return (
+            <Row
+                gutter={6}
+                justify="center"
+                style={{ justifyContent: 'safe center' }}
+            >
+                <Col span={4}>
+                    <Char
+                        status={this.getStatus(0)}
+                        char={firstChar || name[0]}
+                    />
+                </Col>
+                <Col span={4}>
+                    <Char status={this.getStatus(1)} char={name[1]} />
+                </Col>
+                <Col span={4}>
+                    <Char status={this.getStatus(2)} char={name[2]} />
+                </Col>
+                <Col span={4}>
+                    <Char status={this.getStatus(3)} char={name[3]} />
+                </Col>
+                <Col span={4}>
+                    <Char status={this.getStatus(4)} char={name[4]} />
+                </Col>
+            </Row>
+        )
     }
-    
-  };
+}
 
-  render() {
-    const { name, firstChar } = this.props;
-
-    // status: none, correct, wrong, misplaced
-
-    return (
-      <div style={{ width: "550px", margin: "0 auto" }}>
-        <Char status={this.getStatus(0)} char={!!firstChar ? firstChar : name[0]} />
-        <Char status={this.getStatus(1)} char={name[1]} />
-        <Char status={this.getStatus(2)} char={name[2]} />
-        <Char status={this.getStatus(3)} char={name[3]} />
-        <Char status={this.getStatus(4)} char={name[4]} />
-      </div>
-    );
-  }
+Word.propTypes = {
+    firstChar: PropTypes.string,
+    choosenName: PropTypes.array,
+    name: PropTypes.array
 }
