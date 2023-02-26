@@ -8,10 +8,10 @@ const defaultStyle = {
     margin: '3px',
     float: 'left',
     textAlign: 'center',
-    paddingTop: '10px',
-    height: '40px',
+    paddingTop: '0',
+    height: '35px',
     fontSize: '40px',
-    border: '1px solid #ccc'
+    border: '1px solid #ccd'
 }
 
 const wrongWordStyle = {
