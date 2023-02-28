@@ -1,27 +1,21 @@
-import PropTypes from 'prop-types'
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
+import {Button, Space} from "antd";
+import {InfoCircleOutlined, LaptopOutlined, MobileOutlined, SettingOutlined, MehOutlined} from "@ant-design/icons";
 
-import React, { Component } from 'react'
-import { Button, Space } from 'antd'
-import {
-    SettingOutlined,
-    InfoCircleOutlined,
-    LaptopOutlined,
-    MobileOutlined
-} from '@ant-design/icons'
-
-export default class Toolbar extends Component {
+export class Toolbar extends Component {
     onChangeSettings = (value, state) => {
-        const { changeSettings } = this.props
+        const {changeSettings} = this.props
 
         switch (value) {
             case 'infoModalVisible':
-                changeSettings({ infoModalVisible: state })
+                changeSettings({infoModalVisible: state})
                 break
             case 'keyboard':
-                changeSettings({ keyboard: !state })
+                changeSettings({keyboard: !state})
                 break
             case 'settingsModalVisible':
-                changeSettings({ settingsModalVisible: state })
+                changeSettings({settingsModalVisible: state})
                 break
             default:
                 break
@@ -29,7 +23,7 @@ export default class Toolbar extends Component {
     }
 
     render() {
-        const { settings } = this.props
+        const {settings, giveUp} = this.props
 
         return (
             <Space wrap>
@@ -37,25 +31,28 @@ export default class Toolbar extends Component {
                     onClick={() => {
                         this.onChangeSettings('infoModalVisible', true)
                     }}
-                    size="small"
                 >
-                    <InfoCircleOutlined />
+                    <InfoCircleOutlined/>
                 </Button>
                 <Button
                     onClick={() => {
                         this.onChangeSettings('settingsModalVisible', true)
                     }}
-                    size="small"
                 >
-                    <SettingOutlined />
+                    <SettingOutlined/>
+                </Button>
+                <Button
+                    onClick={() => {
+                         giveUp()
+                    }}>
+                    { settings.gaveUp === true ? <MehOutlined spin /> : <MehOutlined/> }
                 </Button>
                 <Button
                     onClick={() => {
                         this.onChangeSettings('keyboard', settings.keyboard)
                     }}
-                    size="small"
                 >
-                    {settings.keyboard === false ? <MobileOutlined /> : <LaptopOutlined />}
+                    {settings.keyboard === false ? <MobileOutlined/> : <LaptopOutlined/>}
                 </Button>
             </Space>
         )
@@ -64,5 +61,6 @@ export default class Toolbar extends Component {
 
 Toolbar.propTypes = {
     settings: PropTypes.object,
-    changeSettings: PropTypes.func
-}
+    changeSettings: PropTypes.func,
+    giveUp: PropTypes.func
+};

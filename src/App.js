@@ -1,27 +1,34 @@
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 
-import { Card } from 'antd'
+import {Card} from 'antd'
 
-import ModalAbout from './components/ModalAbout'
-import ModalGameOver from './components/ModalGameOver'
-import ModalHelp from './components/ModalHelp'
-import Toolbar from './components/Toolbar'
-import GameBoard from './components/GameBoard'
+import {Toolbar} from './components/Toolbar'
 
-import { data } from './assets/vocabulary.js'
-import { alphabet } from './assets/alphabet.js'
+import {HelpModal} from "./components/modals/HelpModal";
+import {AboutModal} from "./components/modals/AboutModal";
+import {SettingsModal} from "./components/modals/SettingsModal";
+import {GameOverModal} from "./components/modals/GameOverModal";
+
+import {GameBoard} from './components/GameBoard'
+
+import {data} from './assets/vocabulary.js'
+import {alphabet} from './assets/alphabet.js'
 
 import Keyboard from 'react-simple-keyboard'
 import 'react-simple-keyboard/build/css/index.css'
 
 import './App.css'
-import ModalSettings from './components/ModalSettings'
+
+
+
+
+
 
 class Lingo extends Component {
     state = {
-        choosenName: [],
+        chosenName: [],
         wordList: [],
-        name: [],
+        name: '',
         lastCorrectWord: '',
         lastWrongWord: '',
         definition: '',
@@ -32,7 +39,6 @@ class Lingo extends Component {
         isGameOverModalOpened: false,
         points: 0,
         wordCount: 0,
-        usedHelp: false,
         winInfo: {
             visible: false
         },
@@ -41,7 +47,8 @@ class Lingo extends Component {
             keyboard: false,
             infoModalVisible: true,
             settingsModalVisible: false,
-            helpModalVisible: false
+            helpModalVisible: false,
+            gaveUp: false,
         }
     }
 
@@ -53,14 +60,15 @@ class Lingo extends Component {
         const item =
             data.vocabulary[Math.floor(Math.random() * data.vocabulary.length)]
         this.setState({
-            choosenName: [...item.title.toUpperCase()],
+            chosenName: [...item.title.toUpperCase()],
             definition: item.definition
         })
     }
 
     componentWillUnmount() {
         document.removeEventListener('keydown', this.keydownHandler)
-        document.removeEventListener('contextmenu', () => {})
+        document.removeEventListener('contextmenu', () => {
+        })
     }
 
     resetGame = () => {
@@ -70,10 +78,10 @@ class Lingo extends Component {
 
         this.setState({
             wordList: [...cleanList],
-            choosenName: [...item.title.toUpperCase()],
+            chosenName: [...item.title.toUpperCase()],
             definition: item.definition,
             name: cleanList,
-            usedHelp: false
+            settings: { gaveUp: false}
         })
 
         this.closeModal()
@@ -84,10 +92,10 @@ class Lingo extends Component {
             name,
             counter,
             wordList,
-            choosenName,
+            chosenName,
             points,
             wordCount,
-            usedHelp,
+            settings,
             definition
         } = this.state
 
@@ -103,14 +111,11 @@ class Lingo extends Component {
 
         // HELP ME - būtu jādzēš ārā
         if (event.key.toUpperCase() === 'Y') {
-           // console.log(choosenName)
+            // console.log(chosenName)
         }
 
         if (event.key.toUpperCase() === 'X') {
-            this.setState({
-                settings: { helpModalVisible: true},
-                usedHelp: true
-            })
+            this.giveUp()
         }
 
         // IZDZEŠAM NO MASĪVA BURTUS
@@ -137,14 +142,14 @@ class Lingo extends Component {
                 })
             } else {
                 const uppercaseName = name.join('').toUpperCase()
-                const uppercaseChoosenName = choosenName.join('').toUpperCase()
+                const uppercaseChosenName = chosenName.join('').toUpperCase()
 
-                // console.log(upercaseName, upercaseChoosenName)
+                // console.log(upercaseName, upercaseChosenName)
 
-                if (uppercaseName === uppercaseChoosenName) {
+                if (uppercaseName === uppercaseChosenName) {
                     console.log('VĀRDS UZMINĒTS!!! APSVEICU!')
 
-                    let addPointCount = 0
+                    let addPointCount
                     switch (wordList.length) {
                         case 0:
                             addPointCount = 10
@@ -166,7 +171,7 @@ class Lingo extends Component {
                             break
                     }
 
-                    if (usedHelp) {
+                    if (settings.gaveUp) {
                         addPointCount = 0
                     }
 
@@ -176,7 +181,7 @@ class Lingo extends Component {
                         wordCount: wordCount + 1,
                         winInfo: {
                             visible: true,
-                            word: uppercaseChoosenName,
+                            word: uppercaseChosenName,
                             description: definition
                         }
                     })
@@ -196,7 +201,7 @@ class Lingo extends Component {
                 if (wordList.length >= 4) {
                     this.setState({
                         isGameOverModalOpened: true,
-                        lastWrongWord: uppercaseChoosenName,
+                        lastWrongWord: uppercaseChosenName,
                         points: 0,
                         wordCount: 0
                     })
@@ -215,23 +220,30 @@ class Lingo extends Component {
         }
     }
 
+    giveUp = () => {
+        const { settings } = this.state
+        this.setState({
+            settings: {...settings, helpModalVisible: true, gaveUp: true}
+        })
+    }
     findWord = (word) => {
         const w = word.join('').toLowerCase()
         return data.vocabulary.find((name) => name.title === w)
     }
 
     closeModal = () => {
-        const { settings } = this.state
+        const {settings} = this.state
 
         const sett = {
             settings: {
                 infoModalVisible: false,
                 settingsModalVisible: false,
                 helpModalVisible: false,
-                keyboard: settings.keyboard
+                keyboard: settings.keyboard,
+                gaveUp: settings.gaveUp
             }
         }
-        const newState = { ...settings, ...sett }
+        const newState = {...settings, ...sett}
         this.setState(newState)
     }
 
@@ -242,7 +254,7 @@ class Lingo extends Component {
     }
 
     onKeyPress = (button) => {
-        const key = { key: button }
+        const key = {key: button}
         if (button === "{shift}" || button === "{lock}") this.handleShift();
 
         this.keydownHandler(key)
@@ -251,26 +263,27 @@ class Lingo extends Component {
 
     handleShift = () => {
         let layoutName = this.state.layoutName;
-    
+
         this.setState({
-          layoutName: layoutName === "default" ? "shift" : "default"
+            layoutName: layoutName === "default" ? "shift" : "default"
         });
-      };
+    };
 
     changeSettings = (sett) => {
-        const { settings } = this.state
+        const {settings} = this.state
+
         this.setState({
-            settings: { ...settings, ...sett }
+            settings: {...settings, ...sett}
         })
+
     }
 
     render() {
         const {
             name,
-            choosenName,
+            chosenName,
             definition,
             wrongWord,
-            isHelpOpened,
             wordList,
             isGameOverModalOpened,
             points,
@@ -278,39 +291,39 @@ class Lingo extends Component {
         } = this.state
 
         return (
-            <div style={{ maxWidth: '510px', margin: '0 auto' }}>
+            <div style={{maxWidth: '504px', margin: '0 auto'}}>
                 <Card
                     title={'Punkti: ' + points}
                     extra={
                         <Toolbar
                             settings={settings}
                             changeSettings={this.changeSettings}
+                            giveUp={this.giveUp}
                         />
                     }
-                    size="small"
                 >
                     <GameBoard
                         name={name}
-                        choosenName={choosenName}
+                        chosenName={chosenName}
                         wordList={wordList}
                         wrongWord={wrongWord}
                     />
                 </Card>
 
-                <ModalHelp
-                    title="Palīdzība"
+                <HelpModal
+                    title="Minamā vārda skaidrojums"
                     open={settings.helpModalVisible}
                     definition={definition}
                     closeModal={this.closeModal}
                 />
 
-                <ModalAbout
-                    title="Īsumā par react Lingo lietotni"
+                <AboutModal
+                    title="Īsumā par lietotni"
                     open={settings.infoModalVisible}
                     closeModal={this.closeModal}
                 />
 
-                <ModalSettings
+                <SettingsModal
                     title="Iestatījumi"
                     open={settings.settingsModalVisible}
                     closeModal={this.closeModal}
@@ -318,11 +331,11 @@ class Lingo extends Component {
                     changeSettings={this.changeSettings}
                 />
 
-                <ModalGameOver
+                <GameOverModal
                     title="Ui, nekas, tā gadās..."
                     open={isGameOverModalOpened}
                     closeModal={this.resetGame}
-                    choosenName={choosenName}
+                    chosenName={chosenName}
                     definition={definition}
                 />
 
@@ -333,20 +346,20 @@ class Lingo extends Component {
                         layoutName={this.state.layoutName}
                         buttonTheme={[
                             {
-                              class: "key-disabled",
-                              buttons: "Q W Y X"
+                                class: "key-disabled",
+                                buttons: "Q W Y X"
                             },
                             {
-                              class: "key-highlight",
-                              buttons: "{shift}"
+                                class: "key-highlight",
+                                buttons: "{shift}"
                             }
-                          ]}
+                        ]}
                         layout={{
                             'default': [
                                 'Q W E R T Y U I O P {bksp}',
                                 '{shift} A S D F G H J K L',
                                 'Z X C V B N M {enter}'
-                            ], 
+                            ],
                             'shift': [
                                 'Q W Ē R T Y Ū Ī O P {bksp}',
                                 '{shift} Ā Š D F G H J Ķ Ļ',
@@ -360,16 +373,6 @@ class Lingo extends Component {
                         }}
                     />
                 )}
-
-                {/*  {winInfo.visible && (
-          <Alert
-            message={'Atminētais vārds: ' + winInfo.word || ''}
-            description={winInfo.description || ''}
-            type='success'
-            showIcon
-            closable
-          />
-        )} */}
             </div>
         )
     }

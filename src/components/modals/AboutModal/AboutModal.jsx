@@ -1,15 +1,15 @@
-import PropTypes from 'prop-types'
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 
-import React, { Component } from 'react'
-import { Modal, Button, Divider } from 'antd'
-export default class ModalAbout extends Component {
+import {Modal, Button, Divider} from 'antd'
+
+export class AboutModal extends Component {
     render() {
-        const { title, open, closeModal } = this.props
-
+        const {title, open, closeModal} = this.props
         return (
             <Modal
                 title={title}
-                style={{ top: 20 }}
+                style={{top: 20}}
                 open={open}
                 footer={[
                     <Button key="ok" type="primary" onClick={closeModal}>
@@ -41,19 +41,13 @@ export default class ModalAbout extends Component {
                         tad par šo vārdu punktus vairs nav iespējams iegūt
                     </li>
                 </ul>
-
-                <Divider orientation="left">Klaviatūra saīsenes </Divider>
-                <ul>
-                    <li>Q - atver šo paziņojumu</li>
-                    <li>X - notiek `palīdzības` paprasīšana</li>
-                </ul>
             </Modal>
         )
     }
 }
 
-ModalAbout.propTypes = {
+AboutModal.propTypes = {
     title: PropTypes.string,
     open: PropTypes.bool,
     closeModal: PropTypes.func
-}
+};
