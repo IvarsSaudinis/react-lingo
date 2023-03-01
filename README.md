@@ -12,5 +12,5 @@ Kristera idejas:
 
 
 Manas idejas:
-* Notīrīt vēsturi
+* Grūtības pakāpes, jo nu daži vārdi ir reti dzirdēti un grūti nosakāmi pat ar skaidrojuma palīdzību
 * izdzīvot...

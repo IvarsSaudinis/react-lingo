@@ -10,7 +10,7 @@ export class History extends Component {
         if (history.length === 0) {
             return <Alert description={"Nav minēti vārdi"} type={'warning'}/>
         }
-        console.log("hist", [])
+
         return history.reverse().map((item, index) =>
             <Alert
                 key={index}
