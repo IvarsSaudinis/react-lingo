@@ -33,7 +33,7 @@ export class AboutModal extends Component {
                         tiek piešķirti
                     </li>
                     <li>
-                        Ja vārdu neatmin ar 5 mēģinājumiem, spēle un iekrātie
+                        Ja vārdu neatmin ar 5 mēģinājumiem, iekrātie
                         punkti tiek zaudēti
                     </li>
                     <li>

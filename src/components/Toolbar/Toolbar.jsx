@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {Button, Space} from "antd";
-import {InfoCircleOutlined, LaptopOutlined, MobileOutlined, SettingOutlined, MehOutlined} from "@ant-design/icons";
+import {InfoCircleOutlined, LaptopOutlined, MobileOutlined, SettingOutlined, OrderedListOutlined, MehOutlined} from "@ant-design/icons";
 
 export class Toolbar extends Component {
     onChangeSettings = (value, state) => {
@@ -17,6 +17,9 @@ export class Toolbar extends Component {
             case 'settingsModalVisible':
                 changeSettings({settingsModalVisible: state})
                 break
+            case 'historyVisible':
+                changeSettings({historyVisible: state})
+                break
             default:
                 break
         }
@@ -26,33 +29,45 @@ export class Toolbar extends Component {
         const {settings, giveUp} = this.props
 
         return (
-            <Space wrap>
+            <Space>
                 <Button
-                    onClick={() => {
+                    onClick={(e) => {
+                        e.target.blur()
                         this.onChangeSettings('infoModalVisible', true)
                     }}
                 >
                     <InfoCircleOutlined/>
                 </Button>
-                <Button
-                    onClick={() => {
+{/*                <Button
+                    onClick={(e) => {
+                        e.target.blur()
                         this.onChangeSettings('settingsModalVisible', true)
                     }}
                 >
                     <SettingOutlined/>
-                </Button>
+                </Button>*/}
                 <Button
-                    onClick={() => {
-                         giveUp()
+                    onClick={(e) => {
+                        e.target.blur()
+                        giveUp()
                     }}>
-                    { settings.gaveUp === true ? <MehOutlined spin /> : <MehOutlined/> }
+                    {settings.gaveUp === true ? <MehOutlined spin/> : <MehOutlined/>}
                 </Button>
                 <Button
-                    onClick={() => {
+                    onClick={(e) => {
+                        e.target.blur()
                         this.onChangeSettings('keyboard', settings.keyboard)
                     }}
                 >
                     {settings.keyboard === false ? <MobileOutlined/> : <LaptopOutlined/>}
+                </Button>
+                <Button
+                    onClick={(e) => {
+                        e.target.blur()
+                        this.onChangeSettings('historyVisible', true)
+                    }}
+                >
+                    <OrderedListOutlined />
                 </Button>
             </Space>
         )

@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 
-import {Card} from 'antd'
+import {Card, notification} from 'antd'
 
 import {Toolbar} from './components/Toolbar'
 
@@ -8,7 +8,7 @@ import {HelpModal} from "./components/modals/HelpModal";
 import {AboutModal} from "./components/modals/AboutModal";
 import {SettingsModal} from "./components/modals/SettingsModal";
 import {GameOverModal} from "./components/modals/GameOverModal";
-
+import {History} from "./components/History";
 import {GameBoard} from './components/GameBoard'
 
 import {data} from './assets/vocabulary.js'
@@ -20,17 +20,18 @@ import 'react-simple-keyboard/build/css/index.css'
 import './App.css'
 
 
-
-
-
+const openSuccessNotification = (word, definition) => {
+    notification.success({
+        message: word,
+        description: definition,
+    });
+};
 
 class Lingo extends Component {
     state = {
         chosenName: [],
         wordList: [],
-        name: '',
-        lastCorrectWord: '',
-        lastWrongWord: '',
+        name: [],
         definition: '',
         counter: 0,
         isInfoModalOpened: true,
@@ -49,8 +50,11 @@ class Lingo extends Component {
             settingsModalVisible: false,
             helpModalVisible: false,
             gaveUp: false,
-        }
+            historyVisible: false
+        },
+        history: []
     }
+
 
     componentDidMount() {
         document.addEventListener('keydown', this.keydownHandler)
@@ -63,6 +67,7 @@ class Lingo extends Component {
             chosenName: [...item.title.toUpperCase()],
             definition: item.definition
         })
+        this.loadGame()
     }
 
     componentWillUnmount() {
@@ -71,19 +76,43 @@ class Lingo extends Component {
         })
     }
 
+    saveGame = () => {
+        const {history, points} = this.state
+        localStorage.setItem('history', JSON.stringify(history));
+        localStorage.setItem('points', points.toString());
+    }
+
+    loadGame = () => {
+        this.setState({
+            points: parseInt(localStorage.getItem('points') ?? 0),
+            history: JSON.parse(localStorage.getItem('history')) ?? []
+        })
+    }
+
+    clearGameHistory = () => {
+
+        localStorage.clear();
+        this.setState({
+            points: 0,
+            history: []
+        })
+    }
     resetGame = () => {
+        const {settings} = this.state
         const item =
             data.vocabulary[Math.floor(Math.random() * data.vocabulary.length)]
         const cleanList = []
 
         this.setState({
             wordList: [...cleanList],
+            isGameOverModalOpened: false,
             chosenName: [...item.title.toUpperCase()],
             definition: item.definition,
-            name: cleanList,
-            settings: { gaveUp: false}
+            name: '',
+            settings: {...settings, gaveUp: false}
         })
 
+        console.log(this.state)
         this.closeModal()
     }
 
@@ -96,7 +125,8 @@ class Lingo extends Component {
             points,
             wordCount,
             settings,
-            definition
+            definition,
+            history
         } = this.state
 
         if (this.state.isGameOverModalOpened) {
@@ -111,7 +141,7 @@ class Lingo extends Component {
 
         // HELP ME - būtu jādzēš ārā
         if (event.key.toUpperCase() === 'Y') {
-            // console.log(chosenName)
+            console.log(chosenName)
         }
 
         if (event.key.toUpperCase() === 'X') {
@@ -149,6 +179,7 @@ class Lingo extends Component {
                 if (uppercaseName === uppercaseChosenName) {
                     console.log('VĀRDS UZMINĒTS!!! APSVEICU!')
 
+                    openSuccessNotification(chosenName, definition)
                     let addPointCount
                     switch (wordList.length) {
                         case 0:
@@ -176,14 +207,20 @@ class Lingo extends Component {
                     }
 
                     this.setState({
-                        lastCorrectWord: uppercaseName,
                         points: points + addPointCount,
                         wordCount: wordCount + 1,
                         winInfo: {
                             visible: true,
                             word: uppercaseChosenName,
                             description: definition
-                        }
+                        },
+                        history: [...history, {
+                            name: chosenName,
+                            definition: definition,
+                            type: 'success'
+                        }]
+                    }, () => {
+                        this.saveGame()
                     })
 
                     this.resetGame()
@@ -199,12 +236,20 @@ class Lingo extends Component {
 
                 // game over
                 if (wordList.length >= 4) {
+
                     this.setState({
                         isGameOverModalOpened: true,
-                        lastWrongWord: uppercaseChosenName,
                         points: 0,
-                        wordCount: 0
+                        wordCount: 0,
+                        history: [...history, {
+                            name: chosenName,
+                            definition: definition,
+                            type: 'error'
+                        }]
+                    }, () => {
+                        this.saveGame()
                     })
+
                     return
                 }
             }
@@ -212,6 +257,7 @@ class Lingo extends Component {
 
         if (name.length > 4) return false
 
+        // pievienojam jaunu simbolu ievades vārda steitam
         if (alphabet.some((element) => event.key.toUpperCase() === element)) {
             this.setState({
                 name: [...name, event.key.toUpperCase()],
@@ -221,7 +267,7 @@ class Lingo extends Component {
     }
 
     giveUp = () => {
-        const { settings } = this.state
+        const {settings} = this.state
         this.setState({
             settings: {...settings, helpModalVisible: true, gaveUp: true}
         })
@@ -247,7 +293,7 @@ class Lingo extends Component {
         this.setState(newState)
     }
 
-    closeGameOverModel = () => {
+    closeGameOverModal = () => {
         this.setState({
             isGameOverModalOpened: false
         })
@@ -268,6 +314,13 @@ class Lingo extends Component {
             layoutName: layoutName === "default" ? "shift" : "default"
         });
     };
+    closeHistory = () => {
+        const {settings} = this.state
+
+        this.setState({
+            settings: {...settings, historyVisible: false}
+        })
+    }
 
     changeSettings = (sett) => {
         const {settings} = this.state
@@ -287,7 +340,8 @@ class Lingo extends Component {
             wordList,
             isGameOverModalOpened,
             points,
-            settings
+            settings,
+            history
         } = this.state
 
         return (
@@ -339,6 +393,12 @@ class Lingo extends Component {
                     definition={definition}
                 />
 
+                <History
+                    open={settings.historyVisible}
+                    onClose={this.closeHistory}
+                    history={history}
+                    clearGameHistory={this.clearGameHistory}
+                />
                 {settings.keyboard && (
                     <Keyboard
                         onKeyPress={this.onKeyPress}

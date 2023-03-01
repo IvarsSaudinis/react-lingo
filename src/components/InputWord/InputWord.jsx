@@ -70,5 +70,5 @@ InputWord.propTypes = {
   chosenName: PropTypes.array,
   wordList: PropTypes.array,
   wrongWord: PropTypes.bool,
-  name: PropTypes.string
+  name: PropTypes.any
 };
