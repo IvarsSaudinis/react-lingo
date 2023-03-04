@@ -13,4 +13,6 @@ Kristera idejas:
 
 Manas idejas:
 * Grūtības pakāpes, jo nu daži vārdi ir reti dzirdēti un grūti nosakāmi pat ar skaidrojuma palīdzību
+* Virtuālās klaviatūras uzlabojumi
+* 
 * izdzīvot...

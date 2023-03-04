@@ -15,11 +15,11 @@ body {
 
 
 .key-highlight {
-  background-color: aliceblue;
-  color: orangered
+
+  color: #8b8d36
 }
 
 .key-disabled {
-  background-color: aliceblue;
+
   color: #CCC
 }

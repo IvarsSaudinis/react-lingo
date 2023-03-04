@@ -34,8 +34,6 @@ class Lingo extends Component {
         name: [],
         definition: '',
         counter: 0,
-        isInfoModalOpened: true,
-        isHelpOpened: false,
         wrongWord: false,
         isGameOverModalOpened: false,
         points: 0,
@@ -52,7 +50,8 @@ class Lingo extends Component {
             gaveUp: false,
             historyVisible: false
         },
-        history: []
+        history: [],
+        disabledButtons: 'Q W Y X'
     }
 
 
@@ -133,19 +132,9 @@ class Lingo extends Component {
             return
         }
 
-        if (event.key.toUpperCase() === 'Q') {
-            this.setState({
-                isInfoModalOpened: true
-            })
-        }
-
         // HELP ME - būtu jādzēš ārā
         if (event.key.toUpperCase() === 'Y') {
             console.log(chosenName)
-        }
-
-        if (event.key.toUpperCase() === 'X') {
-            this.giveUp()
         }
 
         // IZDZEŠAM NO MASĪVA BURTUS
@@ -311,7 +300,8 @@ class Lingo extends Component {
         let layoutName = this.state.layoutName;
 
         this.setState({
-            layoutName: layoutName === "default" ? "shift" : "default"
+            layoutName: layoutName === "default" ? "shift" : "default",
+            disabledButtons: layoutName === "default" ? 'Q W R T Y O P D F H J Z X V B M' : 'Q W Y X'
         });
     };
     closeHistory = () => {
@@ -341,7 +331,8 @@ class Lingo extends Component {
             isGameOverModalOpened,
             points,
             settings,
-            history
+            history,
+            disabledButtons
         } = this.state
 
         return (
@@ -407,7 +398,7 @@ class Lingo extends Component {
                         buttonTheme={[
                             {
                                 class: "key-disabled",
-                                buttons: "Q W Y X"
+                                buttons: disabledButtons
                             },
                             {
                                 class: "key-highlight",
@@ -422,14 +413,14 @@ class Lingo extends Component {
                             ],
                             'shift': [
                                 'Q W Ē R T Y Ū Ī O P {bksp}',
-                                '{shift} Ā Š D F G H J Ķ Ļ',
+                                '{shift} Ā Š D F Ģ H J Ķ Ļ',
                                 'Ž X Č V B Ņ M {enter}'
                             ]
                         }}
                         display={{
                             '{bksp}': 'DZĒST',
                             '{enter}': 'APSTIRPINĀT',
-                            '{shift}': 'A..Ā'
+                            '{shift}': 'a..ā'
                         }}
                     />
                 )}
