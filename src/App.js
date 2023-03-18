@@ -29,6 +29,7 @@ const openSuccessNotification = (word, definition) => {
 
 class Lingo extends Component {
     state = {
+        words:[],
         chosenName: [],
         wordList: [],
         name: [],
@@ -51,7 +52,12 @@ class Lingo extends Component {
             historyVisible: false
         },
         history: [],
-        disabledButtons: 'Q W Y X'
+        disabledButtons: 'Q W Y X',
+        gameLevel: {
+            easy: true,
+            middle: false,
+            hard: false
+        }
     }
 
 
@@ -60,12 +66,7 @@ class Lingo extends Component {
         document.addEventListener('contextmenu', (e) => {
             e.preventDefault()
         })
-        const item =
-            data.vocabulary[Math.floor(Math.random() * data.vocabulary.length)]
-        this.setState({
-            chosenName: [...item.title.toUpperCase()],
-            definition: item.definition
-        })
+
         this.loadGame()
     }
 
@@ -97,9 +98,9 @@ class Lingo extends Component {
         })
     }
     resetGame = () => {
-        const {settings} = this.state
-        const item =
-            data.vocabulary[Math.floor(Math.random() * data.vocabulary.length)]
+        const {words, settings} = this.state
+        const item = words[Math.floor(Math.random() * words.length)]
+
         const cleanList = []
 
         this.setState({
@@ -111,7 +112,6 @@ class Lingo extends Component {
             settings: {...settings, gaveUp: false}
         })
 
-        console.log(this.state)
         this.closeModal()
     }
 
@@ -282,6 +282,33 @@ class Lingo extends Component {
         this.setState(newState)
     }
 
+    closeAboutModal = () => {
+        const {words, gameLevel} = this.state
+
+        let listOfWords = []
+        data.vocabulary.forEach(item=> {
+            if(gameLevel.easy===true && item.level === 1) {
+                listOfWords.push(item)
+            }
+            if(gameLevel.middle===true && item.level === 2) {
+                listOfWords.push(item)
+            }
+            if(gameLevel.hard===true && item.level === 3) {
+                listOfWords.push(item)
+            }
+        })
+
+        const item = listOfWords[Math.floor(Math.random() * listOfWords.length)]
+
+        this.setState({
+            words: [...listOfWords],
+            chosenName: [...item.title.toUpperCase()],
+            definition: item.definition
+        })
+
+        this.closeModal()
+    }
+
     closeGameOverModal = () => {
         this.setState({
             isGameOverModalOpened: false
@@ -321,6 +348,17 @@ class Lingo extends Component {
 
     }
 
+    changeLevel = (checked, level) => {
+        const { gameLevel } = this.state
+        this.setState({
+            gameLevel: {
+                easy: true,
+                middle: level==='middle' ? checked : gameLevel.middle,
+                hard: level==='hard' ? checked : gameLevel.hard
+            }
+        })
+    }
+
     render() {
         const {
             name,
@@ -332,7 +370,8 @@ class Lingo extends Component {
             points,
             settings,
             history,
-            disabledButtons
+            disabledButtons,
+            gameLevel
         } = this.state
 
         return (
@@ -365,7 +404,9 @@ class Lingo extends Component {
                 <AboutModal
                     title="Īsumā par lietotni"
                     open={settings.infoModalVisible}
-                    closeModal={this.closeModal}
+                    closeModal={this.closeAboutModal}
+                    changeLevel={this.changeLevel}
+                    level={{gameLevel}}
                 />
 
                 <SettingsModal
