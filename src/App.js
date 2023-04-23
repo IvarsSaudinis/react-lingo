@@ -387,7 +387,7 @@ class Lingo extends Component {
 
         return (
             <div style={{maxWidth: '504px', margin: '0 auto'}}>
-                <Card
+                <Card style={{padding: "10px", color:"red"}}
                     title={'Punkti: ' + gameState.points}
                     extra={
                         <Toolbar
