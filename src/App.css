@@ -13,7 +13,9 @@ body {
 }
 
 
-
+.ant-card-body {
+  padding: 10px;
+}
 .key-highlight {
 
   color: #8b8d36
