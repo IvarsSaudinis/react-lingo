@@ -7,11 +7,15 @@ body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   margin-top:3px
 }
-.ant-card .ant-card-body {
-  padding: 10px 0px;
+:where(.css-1km3mtt).ant-card .ant-card-body {
+  padding: 7px 0;
   border-radius: 0 0 8px 8px;
 }
 
+.ant-card .ant-card-body {
+  padding: 7px 0;
+  border-radius: 0 0 8px 8px;
+}
 .key-highlight {
   color: #8b8d36
 }
