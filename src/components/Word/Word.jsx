@@ -57,6 +57,6 @@ export class Word extends Component {
 
 Word.propTypes = {
   firstChar: PropTypes.string,
-  chosenName: PropTypes.array,
+  chosenName: PropTypes.string,
   name: PropTypes.string
 };

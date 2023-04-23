@@ -7,46 +7,49 @@ import {InputWord} from "../InputWord";
 
 export class GameBoard extends Component {
     render() {
-        const {chosenName, wordList, wrongWord, name} = this.props
+        const {chosenWord, board, name} = this.props
+        let firstChar  = ''
+
+        if(chosenWord?.length > 0) firstChar = chosenWord[0]
+        if(board.length > 0) firstChar = board[0][0]
 
         return (
             <>
                 <Word
-                    firstChar={chosenName[0]}
-                    chosenName={chosenName}
-                    name={wordList[0] ?? ''}
+                    firstChar={ firstChar }
+                    chosenName={chosenWord}
+                    name={board[0] ?? ''}
                 />
 
                 <Word
-                    chosenName={chosenName}
-                    name={wordList[1] ?? ''}
+                    chosenName={chosenWord}
+                    name={board[1] ?? ''}
                 />
 
                 <Word
-                    chosenName={chosenName}
-                    name={wordList[2] ?? ''}
+                    chosenName={chosenWord}
+                    name={board[2] ?? ''}
                 />
 
                 <Word
-                    chosenName={chosenName}
-                    name={wordList[3] ?? ''}
+                    chosenName={chosenWord}
+                    name={board[3] ?? ''}
                 />
 
                 <Word
-                    chosenName={chosenName}
-                    name={wordList[4] ?? ''}
+                    chosenName={chosenWord}
+                    name={board[4] ?? ''}
                 />
 
                 <Divider style={{margin: '4px 0'}}/>
-                <InputWord wrongWord={wrongWord} name={name}/>
+                <InputWord name={name}/>
             </>
         )
     }
 }
 
 GameBoard.propTypes = {
-    chosenName: PropTypes.array,
-    wordList: PropTypes.array,
-    wrongWord: PropTypes.bool,
+    chosenWord: PropTypes.string,
+    board: PropTypes.array,
     name: PropTypes.any
 };

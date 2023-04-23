@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {Button, Space} from "antd";
-import {InfoCircleOutlined, LaptopOutlined, MobileOutlined, SettingOutlined, OrderedListOutlined, MehOutlined} from "@ant-design/icons";
+import {InfoCircleOutlined, LaptopOutlined, MobileOutlined, OrderedListOutlined, MehOutlined} from "@ant-design/icons";
 
 export class Toolbar extends Component {
     onChangeSettings = (value, state) => {
@@ -26,36 +26,28 @@ export class Toolbar extends Component {
     }
 
     render() {
-        const {settings, giveUp} = this.props
+        const {settings, giveUp, gameStatus } = this.props
 
         return (
             <Space>
                 <Button
                     onClick={(e) => {
-                        e.target.blur()
+                        e.currentTarget.blur()
                         this.onChangeSettings('infoModalVisible', true)
                     }}
                 >
                     <InfoCircleOutlined/>
                 </Button>
-{/*                <Button
-                    onClick={(e) => {
-                        e.target.blur()
-                        this.onChangeSettings('settingsModalVisible', true)
-                    }}
-                >
-                    <SettingOutlined/>
-                </Button>*/}
                 <Button
                     onClick={(e) => {
-                        e.target.blur()
+                        e.currentTarget.blur()
                         giveUp()
                     }}>
-                    {settings.gaveUp === true ? <MehOutlined spin/> : <MehOutlined/>}
+                    {gameStatus === true ? <MehOutlined spin/> : <MehOutlined/>}
                 </Button>
                 <Button
                     onClick={(e) => {
-                        e.target.blur()
+                        e.currentTarget.blur()
                         this.onChangeSettings('keyboard', settings.keyboard)
                     }}
                 >
@@ -63,7 +55,7 @@ export class Toolbar extends Component {
                 </Button>
                 <Button
                     onClick={(e) => {
-                        e.target.blur()
+                        e.currentTarget.blur()
                         this.onChangeSettings('historyVisible', true)
                     }}
                 >

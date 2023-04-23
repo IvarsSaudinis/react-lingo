@@ -1,15 +1,13 @@
 import React, {Component} from 'react'
 
-import {Card, notification} from 'antd'
+import {Card, Modal, notification, message} from 'antd'
 
 import {Toolbar} from './components/Toolbar'
+import {GameBoard} from './components/GameBoard'
 
 import {HelpModal} from "./components/modals/HelpModal";
 import {AboutModal} from "./components/modals/AboutModal";
-import {SettingsModal} from "./components/modals/SettingsModal";
-import {GameOverModal} from "./components/modals/GameOverModal";
 import {History} from "./components/History";
-import {GameBoard} from './components/GameBoard'
 
 import {data} from './assets/vocabulary.js'
 import {alphabet} from './assets/alphabet.js'
@@ -19,7 +17,6 @@ import 'react-simple-keyboard/build/css/index.css'
 
 import './App.css'
 
-
 const openSuccessNotification = (word, definition) => {
     notification.success({
         message: word,
@@ -28,37 +25,34 @@ const openSuccessNotification = (word, definition) => {
 };
 
 class Lingo extends Component {
+
     state = {
-        words:[],
-        chosenName: [],
-        wordList: [],
-        name: [],
-        definition: '',
-        counter: 0,
-        wrongWord: false,
-        isGameOverModalOpened: false,
-        points: 0,
-        wordCount: 0,
-        winInfo: {
-            visible: false
+        chosenWord: {},
+        gameState: {
+            board: [],
+            points: 0,
+            status: 'start', // running, lost, etc...
         },
-        layoutName: 'default',
-        settings: {
-            keyboard: false,
-            infoModalVisible: true,
-            settingsModalVisible: false,
-            helpModalVisible: false,
-            gaveUp: false,
-            historyVisible: false
-        },
-        history: [],
-        disabledButtons: 'Q W Y X',
-        gameLevel: {
+        inputName: '',
+        level: {
             easy: true,
             middle: false,
             hard: false
-        }
+        },
+        isGameOverModalOpened: false,
+        isHelpModalVisible: false,
+        giveUp: false,
+        history: [],
+        layoutName: 'default',
+        disabledButtons: 'Q W Y X',
+        //-------- oldies
+        settings: {
+            keyboard: false,
+            infoModalVisible: true,
+            historyVisible: false
+        },
     }
+
 
 
     componentDidMount() {
@@ -66,111 +60,129 @@ class Lingo extends Component {
         document.addEventListener('contextmenu', (e) => {
             e.preventDefault()
         })
-
         this.loadGame()
+
+        window.addEventListener("resize", this.resize.bind(this));
+        this.resize();
     }
 
     componentWillUnmount() {
         document.removeEventListener('keydown', this.keydownHandler)
         document.removeEventListener('contextmenu', () => {
         })
+        window.removeEventListener("resize", this.resize.bind(this));
+    }
+
+    resize() {
+        let currentHideNav = (window.innerWidth <= 460);
+        if (currentHideNav !== this.state.settings.keyboard) {
+            this.setState({settings: {...this.state.settings, keyboard: currentHideNav}});
+        }
     }
 
     saveGame = () => {
-        const {history, points} = this.state
+        const {gameState, history} = this.state
         localStorage.setItem('history', JSON.stringify(history));
-        localStorage.setItem('points', points.toString());
+        localStorage.setItem('points', gameState.points.toString());
     }
 
     loadGame = () => {
+        const {gameState} = this.state
+
         this.setState({
-            points: parseInt(localStorage.getItem('points') ?? 0),
+            gameState: {
+                ...gameState,
+                points: parseInt(localStorage.getItem('points') ?? 0),
+            },
             history: JSON.parse(localStorage.getItem('history')) ?? []
         })
     }
 
-    clearGameHistory = () => {
+    setNewWord = () => {
+        const {level}   = this.state
+        const wordDict = []
 
+        data.vocabulary.forEach(item => {
+            if(item.level === 1) {
+                wordDict.push(item)
+            }
+            if(item.level === 2 && level.middle) {
+                wordDict.push(item)
+            }
+            if(item.level === 3 && level.hard) {
+                wordDict.push(item)
+            }
+        })
+
+        const word = wordDict[Math.floor(Math.random() * wordDict.length)]
+        return {
+            id: word.id,
+            title: word.title.toUpperCase(),
+            definition: word.definition,
+        }
+    }
+
+    clearGameHistory = () => {
         localStorage.clear();
         this.setState({
-            points: 0,
             history: []
         })
     }
-    resetGame = () => {
-        const {words, settings} = this.state
-        const item = words[Math.floor(Math.random() * words.length)]
 
-        const cleanList = []
-
-        this.setState({
-            wordList: [...cleanList],
-            isGameOverModalOpened: false,
-            chosenName: [...item.title.toUpperCase()],
-            definition: item.definition,
-            name: '',
-            settings: {...settings, gaveUp: false}
-        })
-
-        this.closeModal()
+    handleHelpAction = (pressedKey) => {
+        const {chosenWord} = this.state
+        if (pressedKey.toUpperCase() === 'Y') {
+            console.log(chosenWord.title)
+        }
+    }
+    handleDeleteAction = (pressedKey) => {
+        const {inputName} = this.state
+        if (
+            pressedKey.toUpperCase() === 'DELETE' ||
+            pressedKey.toUpperCase() === 'BACKSPACE' ||
+            pressedKey === '{bksp}'
+        ) {
+            this.setState({
+                inputName: inputName.slice(0, -1)
+            })
+        }
     }
 
     keydownHandler = (event) => {
         const {
-            name,
-            counter,
-            wordList,
-            chosenName,
-            points,
-            wordCount,
-            settings,
-            definition,
+            chosenWord,
+            gameState,
+            inputName,
             history
         } = this.state
+
+        const pressedKey = event.key
 
         if (this.state.isGameOverModalOpened) {
             return
         }
 
-        // HELP ME - būtu jādzēš ārā
-        if (event.key.toUpperCase() === 'Y') {
-            console.log(chosenName)
-        }
+        this.handleHelpAction(pressedKey)
 
-        // IZDZEŠAM NO MASĪVA BURTUS
-        if (
-            event.key.toUpperCase() === 'DELETE' ||
-            event.key.toUpperCase() === 'BACKSPACE' ||
-            event.key === '{bksp}'
-        ) {
-            this.setState({
-                name: name.slice(0, -1),
-                counter: counter + 1,
-                wrongWord: false
-            })
-        }
+        this.handleDeleteAction(pressedKey)
 
         // LOĢIKA, KUR APSTIPRINA VARDU
-        if (
-            name.length === 5 &&
-            (event.key.toUpperCase() === 'ENTER' || event.key === '{enter}')
-        ) {
-            if (this.findWord(name) === undefined) {
-                this.setState({
-                    wrongWord: true
-                })
+        if (inputName.length === 5 && (pressedKey.toUpperCase() === 'ENTER' || pressedKey === '{enter}')) {
+            if (this.findWord(inputName) === undefined) {
+                message.error('Šāds vārds nav atrodams sarakstā. Mēģini citu vārdu!')
+
             } else {
-                const uppercaseName = name.join('').toUpperCase()
-                const uppercaseChosenName = chosenName.join('').toUpperCase()
 
-                // console.log(upercaseName, upercaseChosenName)
+                const uppercaseName = inputName.join('').toUpperCase()
 
-                if (uppercaseName === uppercaseChosenName) {
+                if (uppercaseName === chosenWord.title) {
                     console.log('VĀRDS UZMINĒTS!!! APSVEICU!')
 
-                    openSuccessNotification(chosenName, definition)
+                    openSuccessNotification(chosenWord.title, chosenWord.definition)
+
+                   // cik daudz punkti tiek piešķirti
                     let addPointCount
-                    switch (wordList.length) {
+                    switch (gameState.board.length) {
                         case 0:
                             addPointCount = 10
                             break
@@ -191,48 +203,71 @@ class Lingo extends Component {
                             break
                     }
 
-                    if (settings.gaveUp) {
+                    if(this.state.giveUp) {
                         addPointCount = 0
                     }
 
+                    const currentPoints = gameState.points + addPointCount
+
                     this.setState({
-                        points: points + addPointCount,
-                        wordCount: wordCount + 1,
-                        winInfo: {
-                            visible: true,
-                            word: uppercaseChosenName,
-                            description: definition
+                            chosenWord: this.setNewWord(),
+                            gameState: {
+                                ...gameState,
+                                points: currentPoints,
+                                board: [],
+                            },
+                            inputName: '',
+                            giveUp: false,
+                            history: [...history, {
+                                name: chosenWord.title,
+                                definition: chosenWord.definition,
+                                points: addPointCount,
+                                type: 'success'
+                            }]
                         },
-                        history: [...history, {
-                            name: chosenName,
-                            definition: definition,
-                            type: 'success'
-                        }]
-                    }, () => {
+                        () => {
                         this.saveGame()
                     })
 
-                    this.resetGame()
                 } else {
-                    const newWordList = wordList.concat(
-                        name.join('').toUpperCase()
+                    const newWordList = gameState.board.concat(
+                        inputName.join('').toUpperCase()
                     )
                     this.setState({
-                        wordList: newWordList,
-                        name: ''
+                         gameState: {
+                            ...gameState,
+                            board: [...newWordList],
+                        },
+                        inputName: ''
                     })
                 }
 
                 // game over
-                if (wordList.length >= 4) {
+                if (gameState.board.length >= 4) {
+                    console.log("GAME OVER!!!")
+                    Modal.error({
+                        title: 'Neuzminēji! Minamais vārds: ' + chosenWord.title,
+                        content: chosenWord.definition,
+                        okText: 'nu labi',
+                        cancelText: null,
+                        cancelButtonProps: {
+                            style: {display: 'none'}
+                        }
+                    });
 
+                    // reset board
                     this.setState({
-                        isGameOverModalOpened: true,
-                        points: 0,
-                        wordCount: 0,
+                        chosenWord: this.setNewWord(),
+                        giveUp: false,
+                        gameState: {
+                            points: 0,
+                            board: [],
+                            status: 'game-over'
+                        },
                         history: [...history, {
-                            name: chosenName,
-                            definition: definition,
+                            name: chosenWord.title,
+                            definition: chosenWord.definition,
+                            points: 0,
                             type: 'error'
                         }]
                     }, () => {
@@ -244,23 +279,17 @@ class Lingo extends Component {
             }
         }
 
-        if (name.length > 4) return false
+        // Ja nav ievadīts vārds ar vismaz 5 burtiem, tad neko nedara
+        if (inputName.length > 4) return false
 
         // pievienojam jaunu simbolu ievades vārda steitam
-        if (alphabet.some((element) => event.key.toUpperCase() === element)) {
+        if (alphabet.some((element) => pressedKey.toUpperCase() === element)) {
             this.setState({
-                name: [...name, event.key.toUpperCase()],
-                counter: this.state.counter + 1
+                inputName: [...inputName, pressedKey.toUpperCase()],
             })
         }
     }
 
-    giveUp = () => {
-        const {settings} = this.state
-        this.setState({
-            settings: {...settings, helpModalVisible: true, gaveUp: true}
-        })
-    }
     findWord = (word) => {
         const w = word.join('').toLowerCase()
         return data.vocabulary.find((name) => name.title === w)
@@ -270,12 +299,13 @@ class Lingo extends Component {
         const {settings} = this.state
 
         const sett = {
+            isGameOverModalOpened: false,
+            isHelpModalVisible: false,
+
             settings: {
                 infoModalVisible: false,
-                settingsModalVisible: false,
                 helpModalVisible: false,
                 keyboard: settings.keyboard,
-                gaveUp: settings.gaveUp
             }
         }
         const newState = {...settings, ...sett}
@@ -283,36 +313,12 @@ class Lingo extends Component {
     }
 
     closeAboutModal = () => {
-        const {words, gameLevel} = this.state
-
-        let listOfWords = []
-        data.vocabulary.forEach(item=> {
-            if(gameLevel.easy===true && item.level === 1) {
-                listOfWords.push(item)
-            }
-            if(gameLevel.middle===true && item.level === 2) {
-                listOfWords.push(item)
-            }
-            if(gameLevel.hard===true && item.level === 3) {
-                listOfWords.push(item)
-            }
-        })
-
-        const item = listOfWords[Math.floor(Math.random() * listOfWords.length)]
-
-        this.setState({
-            words: [...listOfWords],
-            chosenName: [...item.title.toUpperCase()],
-            definition: item.definition
-        })
-
+        if( this.state.chosenWord.title === undefined ) {
+            this.setState({
+                chosenWord: this.setNewWord(),
+            })
+        }
         this.closeModal()
-    }
-
-    closeGameOverModal = () => {
-        this.setState({
-            isGameOverModalOpened: false
-        })
     }
 
     onKeyPress = (button) => {
@@ -348,83 +354,71 @@ class Lingo extends Component {
 
     }
 
-    changeLevel = (checked, level) => {
-        const { gameLevel } = this.state
+    changeLevel = (checked, levelInput) => {
         this.setState({
-            gameLevel: {
+            level: {
                 easy: true,
-                middle: level==='middle' ? checked : gameLevel.middle,
-                hard: level==='hard' ? checked : gameLevel.hard
+                middle: levelInput==='middle' ? checked : levelInput.middle,
+                hard: levelInput==='hard' ? checked : levelInput.hard
             }
         })
     }
 
+    giveUp = () => {
+
+        this.setState({
+            isHelpModalVisible: true,
+            giveUp: true,
+        })
+    }
     render() {
         const {
-            name,
-            chosenName,
-            definition,
-            wrongWord,
-            wordList,
-            isGameOverModalOpened,
-            points,
+            chosenWord,
+            gameState,
+            inputName,
+            isHelpModalVisible,
+            giveUp,
+            level,
             settings,
             history,
             disabledButtons,
-            gameLevel
+
         } = this.state
 
         return (
             <div style={{maxWidth: '504px', margin: '0 auto'}}>
                 <Card
-                    title={'Punkti: ' + points}
+                    title={'Punkti: ' + gameState.points}
                     extra={
                         <Toolbar
                             settings={settings}
                             changeSettings={this.changeSettings}
+                            gameStatus={giveUp}
                             giveUp={this.giveUp}
                         />
                     }
                 >
                     <GameBoard
-                        name={name}
-                        chosenName={chosenName}
-                        wordList={wordList}
-                        wrongWord={wrongWord}
+                        name={inputName}
+                        chosenWord={chosenWord.title}
+                        board={gameState.board}
                     />
                 </Card>
-
-                <HelpModal
-                    title="Minamā vārda skaidrojums"
-                    open={settings.helpModalVisible}
-                    definition={definition}
-                    closeModal={this.closeModal}
-                />
 
                 <AboutModal
                     title="Īsumā par lietotni"
                     open={settings.infoModalVisible}
                     closeModal={this.closeAboutModal}
                     changeLevel={this.changeLevel}
-                    level={{gameLevel}}
+                    level={{level}}
                 />
 
-                <SettingsModal
-                    title="Iestatījumi"
-                    open={settings.settingsModalVisible}
+                <HelpModal
+                    title="Minamā vārda skaidrojums"
+                    open={isHelpModalVisible}
+                    definition={chosenWord.definition}
                     closeModal={this.closeModal}
-                    settings={settings}
-                    changeSettings={this.changeSettings}
                 />
-
-                <GameOverModal
-                    title="Ui, nekas, tā gadās..."
-                    open={isGameOverModalOpened}
-                    closeModal={this.resetGame}
-                    chosenName={chosenName}
-                    definition={definition}
-                />
-
                 <History
                     open={settings.historyVisible}
                     onClose={this.closeHistory}

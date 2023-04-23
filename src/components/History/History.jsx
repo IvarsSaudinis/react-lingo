@@ -15,7 +15,10 @@ export class History extends Component {
             <Alert
                 key={index}
                 message={item.name}
-                description={item.definition}
+                description={<div
+                    dangerouslySetInnerHTML={{
+                    __html:  item.definition +  "<br/><i>Punkti: " + item?.points + "</i>"
+                }}></div>}
                 type={item.type}
                 style={{marginBottom: "5px"}}
             />
