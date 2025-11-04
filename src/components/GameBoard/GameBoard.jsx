@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 
-import {Divider} from 'antd'
+import { Separator } from '../ui/separator'
 import {Word} from "../Word";
 import {InputWord} from "../InputWord";
 
@@ -41,7 +41,7 @@ export class GameBoard extends Component {
                     name={board[4] ?? ''}
                 />
 
-                <Divider style={{margin: '4px 0'}}/>
+                <Separator className="my-1"/>
                 <InputWord name={name}/>
             </>
         )

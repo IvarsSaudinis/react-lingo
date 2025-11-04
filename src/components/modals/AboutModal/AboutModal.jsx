@@ -1,7 +1,16 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 
-import {Modal, Button, Divider, Switch} from 'antd'
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '../../ui/dialog'
+import { Button } from '../../ui/button'
+import { Separator } from '../../ui/separator'
+import { Switch } from '../../ui/switch'
 
 import {data} from '../../../assets/vocabulary'
 
@@ -43,47 +52,64 @@ export class AboutModal extends Component {
         const {wordsLevel} = this.state
         const {title, open, closeModal, level } = this.props
         return (
-            <Modal
-                title={title}
-                style={{top: 20}}
-                open={open}
-                footer={[
-                    <Button key="ok" type="primary" onClick={closeModal}>
-                        {'Labi'}
-                    </Button>
-                ]}
-                onCancel={closeModal}
-            >
-                <p>Balstīta uz pasaulē populāru spēli - Lingo.</p>
-                <p>
-                    Veidota kā atvērtā koda lietotne mācību nolūkos (tāpēc ir
-                    vēl ko uzlabot/labot). Pašā pamatā react un ant.design UI,
-                    hostēta bez maksas uz Vercel platformas. Kaut kur kodu var
-                    atrast GitHub.
-                </p>
-                <Divider orientation="left">Noteikumi </Divider>
-                <ul>
-                    <li>Jāatmin vārds latviešu valodā</li>
-                    <li>
-                        Jo ātrāk atmin nejauši izvēlētu vārdu, jo vairāk punkti
-                        tiek piešķirti
-                    </li>
-                    <li>
-                        Ja vārdu neatmin ar 5 mēģinājumiem, iekrātie
-                        punkti tiek zaudēti
-                    </li>
-                    <li>
-                        Ir iespējams noskaidrot minamā vārda skaidrojumu, bet
-                        tad par šo vārdu punktus vairs nav iespējams iegūt
-                    </li>
-                </ul>
-                <Divider orientation="left">Spēles vārdnīca </Divider>
-                <ul style={{listStyle: "none"}}>
-                    <li><Switch disabled defaultChecked size={"small"} /> Spēlē iekļauti salīdzinoši vienkārši vārdi ({wordsLevel.easy})</li>
-                    <li><Switch checked={level.middle} onChange={this.changeMiddle} size={"small"} /> Spēlē iekļauti zināmi vārdi ({wordsLevel.middle}), bet retāk lietoti</li>
-                    <li><Switch checked={level.hard}  onChange={this.changeHard}  size={"small"} /> Spēlē būs arī mazāk zināmi vārdi ({wordsLevel.hard})</li>
-                </ul>
-            </Modal>
+            <Dialog open={open} onOpenChange={(isOpen) => !isOpen && closeModal()}>
+                <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle>{title}</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                        <p>Balstīta uz pasaulē populāru spēli - Lingo.</p>
+                        <p>
+                            Veidota kā atvērtā koda lietotne mācību nolūkos (tāpēc ir
+                            vēl ko uzlabot/labot). Pašā pamatā react un shadcn/ui,
+                            hostēta bez maksas uz Vercel platformas. Kaut kur kodu var
+                            atrast GitHub.
+                        </p>
+                        <div>
+                            <h4 className="text-sm font-semibold mb-2">Noteikumi</h4>
+                            <Separator className="mb-3" />
+                            <ul className="space-y-2 list-disc pl-5">
+                                <li>Jāatmin vārds latviešu valodā</li>
+                                <li>
+                                    Jo ātrāk atmin nejauši izvēlētu vārdu, jo vairāk punkti
+                                    tiek piešķirti
+                                </li>
+                                <li>
+                                    Ja vārdu neatmin ar 5 mēģinājumiem, iekrātie
+                                    punkti tiek zaudēti
+                                </li>
+                                <li>
+                                    Ir iespējams noskaidrot minamā vārda skaidrojumu, bet
+                                    tad par šo vārdu punktus vairs nav iespējams iegūt
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 className="text-sm font-semibold mb-2">Spēles vārdnīca</h4>
+                            <Separator className="mb-3" />
+                            <ul className="space-y-3">
+                                <li className="flex items-center gap-2">
+                                    <Switch disabled defaultChecked />
+                                    <span className="text-sm">Spēlē iekļauti salīdzinoši vienkārši vārdi ({wordsLevel.easy})</span>
+                                </li>
+                                <li className="flex items-center gap-2">
+                                    <Switch checked={level.middle} onCheckedChange={this.changeMiddle} />
+                                    <span className="text-sm">Spēlē iekļauti zināmi vārdi ({wordsLevel.middle}), bet retāk lietoti</span>
+                                </li>
+                                <li className="flex items-center gap-2">
+                                    <Switch checked={level.hard} onCheckedChange={this.changeHard} />
+                                    <span className="text-sm">Spēlē būs arī mazāk zināmi vārdi ({wordsLevel.hard})</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button onClick={closeModal}>
+                            Labi
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         )
     }
 }

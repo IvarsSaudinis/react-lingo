@@ -1,28 +1,36 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import { Modal, Button } from 'antd'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '../../ui/dialog'
+import { Button } from '../../ui/button'
+
 export class HelpModal extends Component {
   render() {
     const { title, open, closeModal, definition } = this.props
 
     return (
-        <Modal
-            title={title}
-            style={{ top: 20 }}
-            open={open}
-            onOk={closeModal}
-            onCancel={closeModal}
-            cancelText={null}
-            cancelButtonProps={false}
-            footer={[
-              <Button key="ok" type="primary" onClick={closeModal}>
-                {'Labi'}
+        <Dialog open={open} onOpenChange={(isOpen) => !isOpen && closeModal()}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{title}</DialogTitle>
+            </DialogHeader>
+            <DialogDescription>
+              {definition}
+            </DialogDescription>
+            <DialogFooter>
+              <Button onClick={closeModal}>
+                Labi
               </Button>
-            ]}
-        >
-          <p>{definition}</p>
-        </Modal>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
     )
   }
 }
