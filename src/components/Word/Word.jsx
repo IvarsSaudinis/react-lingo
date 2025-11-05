@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import {Col, Row} from "antd";
 import {Char} from "../Char";
 
 export class Word extends Component {
@@ -27,30 +26,16 @@ export class Word extends Component {
   render() {
     const { name, firstChar } = this.props
     return (
-        <Row
-            gutter={6}
-            justify="center"
-            style={{ justifyContent: 'safe center' }}
-        >
-          <Col span={4}>
-            <Char
-                status={this.getCharPositionStatus(0)}
-                char={firstChar || name[0]}
-            />
-          </Col>
-          <Col span={4}>
-            <Char status={this.getCharPositionStatus(1)} char={name[1]} />
-          </Col>
-          <Col span={4}>
-            <Char status={this.getCharPositionStatus(2)} char={name[2]} />
-          </Col>
-          <Col span={4}>
-            <Char status={this.getCharPositionStatus(3)} char={name[3]} />
-          </Col>
-          <Col span={4}>
-            <Char status={this.getCharPositionStatus(4)} char={name[4]} />
-          </Col>
-        </Row>
+        <div className="flex gap-1.5 justify-center">
+          <Char
+              status={this.getCharPositionStatus(0)}
+              char={firstChar || name[0]}
+          />
+          <Char status={this.getCharPositionStatus(1)} char={name[1]} />
+          <Char status={this.getCharPositionStatus(2)} char={name[2]} />
+          <Char status={this.getCharPositionStatus(3)} char={name[3]} />
+          <Char status={this.getCharPositionStatus(4)} char={name[4]} />
+        </div>
     )
   }
 }

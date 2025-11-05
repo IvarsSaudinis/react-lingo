@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {Button, Space} from "antd";
-import {InfoCircleOutlined, LaptopOutlined, MobileOutlined, OrderedListOutlined, MehOutlined} from "@ant-design/icons";
+import { Button } from "../ui/button";
+import { Info, Laptop, Smartphone, List, Frown } from "lucide-react";
 
 export class Toolbar extends Component {
     onChangeSettings = (value, state) => {
@@ -29,39 +29,47 @@ export class Toolbar extends Component {
         const {settings, giveUp, gameStatus } = this.props
 
         return (
-            <Space>
+            <div className="flex gap-2">
                 <Button
+                    variant="outline"
+                    size="icon"
                     onClick={(e) => {
                         e.currentTarget.blur()
                         this.onChangeSettings('infoModalVisible', true)
                     }}
                 >
-                    <InfoCircleOutlined/>
+                    <Info className="h-4 w-4"/>
                 </Button>
                 <Button
+                    variant="outline"
+                    size="icon"
                     onClick={(e) => {
                         e.currentTarget.blur()
                         giveUp()
                     }}>
-                    {gameStatus === true ? <MehOutlined spin/> : <MehOutlined/>}
+                    <Frown className={`h-4 w-4 ${gameStatus === true ? 'animate-spin' : ''}`}/>
                 </Button>
                 <Button
+                    variant="outline"
+                    size="icon"
                     onClick={(e) => {
                         e.currentTarget.blur()
                         this.onChangeSettings('keyboard', settings.keyboard)
                     }}
                 >
-                    {settings.keyboard === false ? <MobileOutlined/> : <LaptopOutlined/>}
+                    {settings.keyboard === false ? <Smartphone className="h-4 w-4"/> : <Laptop className="h-4 w-4"/>}
                 </Button>
                 <Button
+                    variant="outline"
+                    size="icon"
                     onClick={(e) => {
                         e.currentTarget.blur()
                         this.onChangeSettings('historyVisible', true)
                     }}
                 >
-                    <OrderedListOutlined />
+                    <List className="h-4 w-4" />
                 </Button>
-            </Space>
+            </div>
         )
     }
 }

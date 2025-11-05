@@ -1,67 +1,32 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import { Row, Col } from 'antd'
-
-const defaultStyle = {
-  borderRadius: '4px',
-  margin: '3px',
-  float: 'left',
-  textAlign: 'center',
-  paddingTop: '0',
-  height: '35px',
-  fontSize: '40px',
-  border: '1px solid #ccd'
-}
-
-const wrongWordStyle = {
-  backgroundColor: 'orange'
-}
 export class InputWord extends Component {
   render() {
     const { name, wrongWord } = this.props
 
-    let style = defaultStyle
-
-    if (wrongWord) {
-      style = {
-        ...defaultStyle,
-        ...wrongWordStyle
-      }
-    }
+    const charClass = `char rounded border border-gray-300 m-[3px] text-center h-[35px] text-[40px] leading-[35px] ${
+      wrongWord ? 'bg-orange-400' : ''
+    }`
 
     return (
-        <Row
-            gutter={6}
-            justify="center"
-            style={{ justifyContent: 'safe center' }}
-        >
-          <Col span={4}>
-            <div className="char" style={style}>
-              {name[0]}
-            </div>
-          </Col>
-          <Col span={4}>
-            <div className="char" style={style}>
-              {name[1]}
-            </div>
-          </Col>
-          <Col span={4}>
-            <div className="char" style={style}>
-              {name[2]}
-            </div>
-          </Col>
-          <Col span={4}>
-            <div className="char" style={style}>
-              {name[3]}
-            </div>
-          </Col>
-          <Col span={4}>
-            <div className="char" style={style}>
-              {name[4]}
-            </div>
-          </Col>
-        </Row>
+        <div className="flex gap-1.5 justify-center">
+          <div className={charClass}>
+            {name[0]}
+          </div>
+          <div className={charClass}>
+            {name[1]}
+          </div>
+          <div className={charClass}>
+            {name[2]}
+          </div>
+          <div className={charClass}>
+            {name[3]}
+          </div>
+          <div className={charClass}>
+            {name[4]}
+          </div>
+        </div>
     )
   }
 }

@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 
-import {Card, Modal, notification, message} from 'antd'
+import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card'
+import { toast } from 'sonner'
 
 import {Toolbar} from './components/Toolbar'
 import {GameBoard} from './components/GameBoard'
@@ -8,6 +9,15 @@ import {GameBoard} from './components/GameBoard'
 import {HelpModal} from "./components/modals/HelpModal";
 import {AboutModal} from "./components/modals/AboutModal";
 import {History} from "./components/History";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from './components/ui/dialog'
+import { Button } from './components/ui/button'
 
 import {data} from './assets/vocabulary.js'
 import {alphabet} from './assets/alphabet.js'
@@ -18,8 +28,7 @@ import 'react-simple-keyboard/build/css/index.css'
 import './App.css'
 
 const openSuccessNotification = (word, definition) => {
-    notification.success({
-        message: word,
+    toast.success(word, {
         description: definition,
     });
 };
@@ -40,6 +49,7 @@ class Lingo extends Component {
             hard: false
         },
         isGameOverModalOpened: false,
+        gameOverData: { word: '', definition: '' },
         isHelpModalVisible: false,
         giveUp: false,
         history: [],
@@ -169,7 +179,7 @@ class Lingo extends Component {
         // LOĢIKA, KUR APSTIPRINA VARDU
         if (inputName.length === 5 && (pressedKey.toUpperCase() === 'ENTER' || pressedKey === '{enter}')) {
             if (this.findWord(inputName) === undefined) {
-                message.error('Šāds vārds nav atrodams sarakstā. Mēģini citu vārdu!')
+                toast.error('Šāds vārds nav atrodams sarakstā. Mēģini citu vārdu!')
 
             } else {
 
@@ -245,13 +255,12 @@ class Lingo extends Component {
                 // game over
                 if (gameState.board.length >= 4) {
                     console.log("GAME OVER!!!")
-                    Modal.error({
-                        title: 'Neuzminēji! Minamais vārds: ' + chosenWord.title,
-                        content: chosenWord.definition,
-                        okText: 'nu labi',
-                        cancelText: null,
-                        cancelButtonProps: {
-                            style: {display: 'none'}
+
+                    this.setState({
+                        isGameOverModalOpened: true,
+                        gameOverData: {
+                            word: chosenWord.title,
+                            definition: chosenWord.definition
                         }
                     });
 
@@ -310,6 +319,12 @@ class Lingo extends Component {
         }
         const newState = {...settings, ...sett}
         this.setState(newState)
+    }
+
+    closeGameOverModal = () => {
+        this.setState({
+            isGameOverModalOpened: false
+        })
     }
 
     closeAboutModal = () => {
@@ -377,6 +392,8 @@ class Lingo extends Component {
             gameState,
             inputName,
             isHelpModalVisible,
+            isGameOverModalOpened,
+            gameOverData,
             giveUp,
             level,
             settings,
@@ -386,23 +403,26 @@ class Lingo extends Component {
         } = this.state
 
         return (
-            <div style={{maxWidth: '504px', margin: '0 auto'}}>
-                <Card style={{padding: "10px", color:"red"}}
-                    title={'Punkti: ' + gameState.points}
-                    extra={
-                        <Toolbar
-                            settings={settings}
-                            changeSettings={this.changeSettings}
-                            gameStatus={giveUp}
-                            giveUp={this.giveUp}
+            <div className="max-w-[504px] mx-auto">
+                <Card className="p-2.5">
+                    <CardHeader className="p-4 pb-2">
+                        <div className="flex justify-between items-center">
+                            <CardTitle className="text-xl">Punkti: {gameState.points}</CardTitle>
+                            <Toolbar
+                                settings={settings}
+                                changeSettings={this.changeSettings}
+                                gameStatus={giveUp}
+                                giveUp={this.giveUp}
+                            />
+                        </div>
+                    </CardHeader>
+                    <CardContent className="p-4 pt-2">
+                        <GameBoard
+                            name={inputName}
+                            chosenWord={chosenWord.title}
+                            board={gameState.board}
                         />
-                    }
-                >
-                    <GameBoard
-                        name={inputName}
-                        chosenWord={chosenWord.title}
-                        board={gameState.board}
-                    />
+                    </CardContent>
                 </Card>
 
                 <AboutModal
@@ -419,6 +439,25 @@ class Lingo extends Component {
                     definition={chosenWord.definition}
                     closeModal={this.closeModal}
                 />
+
+                <Dialog open={isGameOverModalOpened} onOpenChange={(isOpen) => !isOpen && this.closeGameOverModal()}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle className="text-destructive">
+                                Neuzminēji! Minamais vārds: {gameOverData.word}
+                            </DialogTitle>
+                        </DialogHeader>
+                        <DialogDescription>
+                            {gameOverData.definition}
+                        </DialogDescription>
+                        <DialogFooter>
+                            <Button onClick={this.closeGameOverModal}>
+                                nu labi
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+
                 <History
                     open={settings.historyVisible}
                     onClose={this.closeHistory}
